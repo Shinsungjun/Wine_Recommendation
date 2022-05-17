@@ -8,7 +8,7 @@ _C = CN(new_allowed=True)
 _C.SYS = CN(new_allowed=True)
 _C.SYS.EXP_NAME = ''
 #_C.SYS.OUTPUT_DIR = 'results/' + _C.SYS.EXP_NAME + '/'
-# _C.SYS.GPUS = (0,1,2,3)
+# _C.SYS.GPUS =#(0,1,2,3)
 # _C.SYS.WORKERS = 8
 # _C.SYS.PIN_MEMORY = True
 # _C.SYS.LOCAL_RANK = ''
@@ -18,22 +18,22 @@ _C.SYS.EXP_NAME = ''
 
 
 _C.TRAIN = CN(new_allowed=True)
-# _C.TRAIN.RESUME = 
-# _C.TRAIN.START_EPOCH =
-# _C.TRAIN.END_EPOCH = 
+_C.TRAIN.RESUME = ''
+_C.TRAIN.START_EPOCH = 0
+_C.TRAIN.END_EPOCH = 10
 # _C.TRAIN.PRINT_FREQ = 
-# _C.TRAIN.BATCH_SIZE = 
+_C.TRAIN.BATCH_SIZE = 16
 # _C.TRAIN.BATCH_SIZE_VAL = 
-# _C.TRAIN.SEED = 
+_C.TRAIN.SEED = 68
 
-# _C.TRAIN.CUDNN = CN(new_allowed=True)
-# _C.TRAIN.CUDNN.BENCHMARK = 
-# _C.TRAIN.CUDNN.DETERMINISTIC = 
-# _C.TRAIN.CUDNN.ENABLED = 
+_C.TRAIN.CUDNN = CN(new_allowed=True)
+_C.TRAIN.CUDNN.BENCHMARK = False
+_C.TRAIN.CUDNN.DETERMINISTIC = False
+_C.TRAIN.CUDNN.ENABLED = False
 
-# _C.TRAIN.OPT = CN(new_allowed=True)
+_C.TRAIN.OPT = CN(new_allowed=True)
 # _C.TRAIN.OPT.NAME = 
-# _C.TRAIN.OPT.LR = 
+_C.TRAIN.OPT.LR = 0.0001
 # _C.TRAIN.OPT.NBB_LR = 
 # _C.TRAIN.OPT.WD = 
 # _C.TRAIN.OPT.MOMENTUM =
