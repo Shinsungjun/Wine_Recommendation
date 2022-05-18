@@ -79,10 +79,11 @@ def main():
     msg = '[{time}]' 'starts experiments setting '\
             '{exp_name}'.format(time = time.ctime(), exp_name = cfg.SYS.EXP_NAME)
     logger.info(msg)
-    
-
+    gpus = cfg.SYS.GPUS
+    if isinstance(gpus, int):
+        gpus = [gpus]
     # * GPU env setup. * #
-    distributed = len(cfg.SYS.GPUS)>0 #!
+    distributed = len(gpus)>1 #!
     if distributed:
         torch.distributed.init_process_group(
             backend="nccl", init_method="env://",
@@ -90,8 +91,8 @@ def main():
 
 
     # # * define MODEL * #
-    if dist.get_rank()==0:
-        logger.info("=> creating model ...")
+    #if dist.get_rank() in [0, -1]:
+    logger.info("=> creating model ...")
 
     #! model build ! ! !
     model = SiameseNetwork()
@@ -108,11 +109,10 @@ def main():
             output_device=args.local_rank
         )
     else:
-        model = nn.DataParallel(model, device_ids=cfg.gpus).cuda()
+        model = model.to('cuda')
 
-    if dist.get_rank()==0:
-        logger.info(model)
-
+    #if dist.get_rank() in [0, -1]:
+    logger.info(model)
 
     # * define OPTIMIZER * #
     # params_dict = dict(model.named_parameters())
@@ -234,14 +234,14 @@ def train(model, train_loader, optimizer, epoch, cfg):
         
 
 
-        outputs_1 = model(inputs[0],inputs[1]) #same # returns loss and predictions at each GPU
+        outputs_1 = model(inputs[0].to('cuda'),inputs[1].to('cuda')) #same # returns loss and predictions at each GPU
         loss_1 = loss_fn_1(outputs_1, torch.ones(outputs_1.shape).to('cuda'))
         
         loss_1.backward() # distributed.datapaprallel automatically gather and syncronize losses.
         optimizer.step()
         
         # loss_2
-        outputs_2 = model(inputs[0],inputs[2]) #diff # returns loss and predictions at each GPU
+        outputs_2 = model(inputs[0].to('cuda'),inputs[2].to('cuda')) #diff # returns loss and predictions at each GPU
         loss_2 = loss_fn_2(outputs_2, torch.zeros(outputs_2.shape).to('cuda'))
         optimizer.zero_grad()
         
@@ -249,15 +249,15 @@ def train(model, train_loader, optimizer, epoch, cfg):
         optimizer.step()
 
         # *  this tis for recordings.
-        n = outputs_2.shape[0] # n = batch size of each GPU #!
-        if dist.is_initialized():
-            loss_1 = loss_1 * n
-            dist.all_reduce(loss_1)
-            loss_1 = loss_1 / cfg.TRAIN.BATCH_SIZE
+        # n = outputs_2.shape[0] # n = batch size of each GPU #!
+        # if dist.is_initialized():
+        #     loss_1 = loss_1 * n
+        #     dist.all_reduce(loss_1)
+        #     loss_1 = loss_1 / cfg.TRAIN.BATCH_SIZE
 
-            loss_2 = loss_2 * n
-            dist.all_reduce(loss_2)
-            loss_2 = loss_2 / cfg.TRAIN.BATCH_SIZE
+        #     loss_2 = loss_2 * n
+        #     dist.all_reduce(loss_2)
+        #     loss_2 = loss_2 / cfg.TRAIN.BATCH_SIZE
 
         loss_meter_1.update(loss_1.item(), cfg.TRAIN.BATCH_SIZE)
         loss_meter_2.update(loss_2.item(), cfg.TRAIN.BATCH_SIZE)
@@ -275,13 +275,13 @@ def train(model, train_loader, optimizer, epoch, cfg):
         t_h, t_m = divmod(t_m, 60)
         remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
         
-        if (i_iter+1) % cfg.TRAIN.PRINT_FREQ == 0 and dist.get_rank() == 0:
+        if (i_iter+1) % cfg.TRAIN.PRINT_FREQ == 0:# and dist.get_rank() == 0:
             msg ='Epoch: [{}/{}]({:.2f}%) [{}/{}] '\
                     'Data {data_time.val:.3f} ({data_time.avg:.3f}) '\
                     'Batch {batch_time.val:.3f} ({batch_time.avg:.3f}) '\
                     'Remain {remain_time} '\
-                    'Loss1 {loss_meter_1.val:.4f} '\
-                    'Loss2 {loss_meter_2.val:.4f} '\
+                    'Loss1 {loss_meter_1.val:.8f} '\
+                    'Loss2 {loss_meter_2.val:.8f} '\
                     'lr {lr}.\n'.format(epoch, cfg.TRAIN.END_EPOCH, 
                                     # ((epoch)/cfg.TRAIN.END_EPOCH)*100, 
                                     (current_iter/max_iter)*100, 

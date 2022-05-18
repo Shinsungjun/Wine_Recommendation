@@ -112,8 +112,8 @@ def build_train_loader(cfg):
 
     data_loader = torch.utils.data.DataLoader(train_data,
                                               num_workers=4,
-                                              batch_size=cfg.TRAIN.BATCH_SIZE // len(cfg.SYS.GPUS),
-                                              shuffle=False,
+                                              batch_size=cfg.TRAIN.BATCH_SIZE,
+                                              shuffle=True,
                                               pin_memory=True,
                                               drop_last=True,
                                               sampler=sampler)
