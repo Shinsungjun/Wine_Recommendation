@@ -7,7 +7,7 @@ _C = CN(new_allowed=True)
 ''' Define system environment for Training '''
 _C.SYS = CN(new_allowed=True)
 _C.SYS.EXP_NAME = ''
-#_C.SYS.OUTPUT_DIR = 'results/' + _C.SYS.EXP_NAME + '/'
+_C.SYS.OUTPUT_DIR = 'results/' + _C.SYS.EXP_NAME + '/'
 # _C.SYS.GPUS =#(0,1,2,3)
 # _C.SYS.WORKERS = 8
 # _C.SYS.PIN_MEMORY = True

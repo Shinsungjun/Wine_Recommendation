@@ -16,6 +16,7 @@ from torch.nn.parallel import DistributedDataParallel
 import torch.distributed as dist
 import torch.optim as optim
 import torch.nn.functional as F
+from torch.optim import lr_scheduler
 
 
 from model import SiameseNetwork
@@ -81,36 +82,36 @@ def main():
     
 
     # * GPU env setup. * #
-    distributed = False #(len(cfg.SYS.GPUS)>0) #!
-    # if distributed:
-    #     torch.distributed.init_process_group(
-    #         backend="nccl", init_method="env://",
-    #     )
+    distributed = len(cfg.SYS.GPUS)>0 #!
+    if distributed:
+        torch.distributed.init_process_group(
+            backend="nccl", init_method="env://",
+        )
 
 
     # # * define MODEL * #
-    # if dist.get_rank()==0:
-    #     logger.info("=> creating model ...")
+    if dist.get_rank()==0:
+        logger.info("=> creating model ...")
 
     #! model build ! ! !
     model = SiameseNetwork()
 
-    # if distributed:
-    #     device = torch.device('cuda:{}'.format(args.local_rank))
-    #     torch.cuda.set_device(device)
+    if distributed:
+        device = torch.device('cuda:{}'.format(args.local_rank))
+        torch.cuda.set_device(device)
 
-    #     model = model.to(device)
-    #     model = DistributedDataParallel(
-    #         model,
-    #         find_unused_parameters=True,
-    #         device_ids=[args.local_rank],
-    #         output_device=args.local_rank
-    #     )
-    # else:
-    #     model = nn.DataParallel(model, device_ids=cfg.gpus).cuda()
+        model = model.to(device)
+        model = DistributedDataParallel(
+            model,
+            find_unused_parameters=True,
+            device_ids=[args.local_rank],
+            output_device=args.local_rank
+        )
+    else:
+        model = nn.DataParallel(model, device_ids=cfg.gpus).cuda()
 
-    # if dist.get_rank()==0:
-    #     logger.info(model)
+    if dist.get_rank()==0:
+        logger.info(model)
 
 
     # * define OPTIMIZER * #
@@ -119,13 +120,15 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.OPT.LR)
     print(cfg.TRAIN.OPT.LR)
+    # * define LR Scheduler * #
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.8)    
 
     # * build DATALODER * #
     train_loader = build_train_loader(cfg)
     # val_loader = build_val_loader(cfg)
 
     # * Training setup * #
-    best_a1 = 0
+    best_loss = 100
     best_epoch = 0
 
     # * RESUME * #
@@ -139,7 +142,7 @@ def main():
             new_epoch = ['TRAIN.START_EPOCH' ,checkpoint['epoch']]
             cfg = update_config(cfg, new_epoch)
 
-            best_a1 = checkpoint['best_a1']
+            best_loss = checkpoint['best_loss']
             best_epoch = checkpoint['epoch']
 
             # state_dict control
@@ -172,45 +175,42 @@ def main():
 
     for epoch in range(cfg.TRAIN.START_EPOCH, cfg.TRAIN.END_EPOCH+1):
 
-        train_loss_1,train_loss_2   = train(model, train_loader, optimizer, epoch, cfg)
-        print(train_loss_1, train_loss_2)
-        # val_loss, val_metrics = validation(model, val_loader, cfg, epoch)
+        train_loss_1,train_loss_2 = train(model, train_loader, optimizer, epoch, cfg)
+        train_loss_total = train_loss_1 + train_loss_2
 
-        # if args.local_rank <= 0:
-        #     tWriter.add_scalar('loss', train_loss, epoch)
-        #     vWriter.add_scalar('loss', val_loss, epoch)
-        #     for k, v in train_metrics.items():
-        #         tWriter.add_scalar('{}'.format(k), v.avg, epoch)
-
-        #     for k, v in val_metrics.items():
-        #         vWriter.add_scalar('{}'.format(k), v.avg, epoch)
+        if args.local_rank <= 0:
+            tWriter.add_scalar('loss', train_loss_total, epoch)
                 
-        #     if best_a1 > val_metrics['de/abs_rel'].avg:
-        #         torch.save({
-        #             'epoch': epoch,
-        #             'state_dict': model.module.state_dict(),
-        #             'optimizer': optimizer.state_dict(),
-        #         }, os.path.join(cfg.SYS.OUTPUT_DIR,'best.pth.tar'))
-        #         best_a1 = val_metrics['de/abs_rel'].avg
-        #         best_epoch = epoch
+            if best_loss > train_loss_total:
+                torch.save({
+                    'epoch': epoch,
+                    'state_dict': model.module.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                }, os.path.join(cfg.SYS.OUTPUT_DIR,'best.pth.tar'))
+                best_loss = train_loss_total
+                best_epoch = epoch
 
-        #     torch.save({
-        #         'epoch': epoch,
-        #         'state_dict': model.module.state_dict(),
-        #         'optimizer': optimizer.state_dict(),
-        #         'best_a1': best_a1,
-        #         'bset_epoch': best_epoch,
-        #     }, os.path.join(cfg.SYS.OUTPUT_DIR,'checkpoint.pth.tar'))
+            torch.save({
+                'epoch': epoch,
+                'state_dict': model.module.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'best_loss': best_loss,
+                'bset_epoch': best_epoch,
+            }, os.path.join(cfg.SYS.OUTPUT_DIR,'checkpoint.pth.tar'))
 
-    #     if args.local_rank <= 0:
-    #         msg = 'Loss_train: {:.10f}  Loss_val: {:.10f}'.format(train_loss, val_loss)
-    #         logger.info(msg)
-    #         msg = 'Best a1: {}  Best Epoch: {}'.format(best_a1, best_epoch)
-    #         logger.info(msg)
+        if args.local_rank <= 0:
+            msg = 'Loss_train: {:.10f}'.format(train_loss_total)
+            logger.info(msg)
+            msg = 'Best loss: {}  Best Epoch: {}'.format(best_loss, best_epoch)
+            logger.info(msg)
+        
+        scheduler.step()
 
-    # if args.local_rank <= 0:
-    #     torch.save(model.module.state_dict(),
-    #         os.path.join(cfg.SYS.OUTPUT_DIR, 'final_state.pth'))
+    if args.local_rank <= 0:
+        torch.save(model.module.state_dict(),
+            os.path.join(cfg.SYS.OUTPUT_DIR, 'final_state.pth'))
+
+    
 
 
 def train(model, train_loader, optimizer, epoch, cfg):
@@ -227,13 +227,7 @@ def train(model, train_loader, optimizer, epoch, cfg):
     loss_fn_1 = torch.nn.BCEWithLogitsLoss()
     loss_fn_2 = torch.nn.BCEWithLogitsLoss()
     
-    print(len(train_loader))
-    # before = None
     for i_iter, (inputs) in enumerate(train_loader):
-        # print(inputs[0] == inputs[1])
-        # print(inputs[0] == inputs[2])
-        
-
         optimizer.zero_grad()
         
         data_time.update(time.time() - end)
@@ -241,39 +235,30 @@ def train(model, train_loader, optimizer, epoch, cfg):
 
 
         outputs_1 = model(inputs[0],inputs[1]) #same # returns loss and predictions at each GPU
-        loss_1 = loss_fn_1(outputs_1, torch.ones(outputs_1.shape))
-        # l2 sigmoid 1 
+        loss_1 = loss_fn_1(outputs_1, torch.ones(outputs_1.shape).to('cuda'))
         
-        # model.zero_grad()
         loss_1.backward() # distributed.datapaprallel automatically gather and syncronize losses.
         optimizer.step()
         
-        
-        
         # loss_2
         outputs_2 = model(inputs[0],inputs[2]) #diff # returns loss and predictions at each GPU
-        
-        
-        # print(outputs_1, outputs_2)
-        
-        loss_2 = loss_fn_2(outputs_2, torch.zeros(outputs_2.shape))
-        
-        # loss_total = loss_1 + loss_2
-        # loss_total.backward()
+        loss_2 = loss_fn_2(outputs_2, torch.zeros(outputs_2.shape).to('cuda'))
         optimizer.zero_grad()
         
         loss_2.backward()
         optimizer.step()
-        # print(loss_1.item(),loss_2.item())
-        # print(loss_total.item())
 
-    
         # *  this tis for recordings.
         n = outputs_2.shape[0] # n = batch size of each GPU #!
         if dist.is_initialized():
-            loss = loss * n
-            dist.all_reduce(loss)
-            loss = loss / cfg.TRAIN.BATCH_SIZE
+            loss_1 = loss_1 * n
+            dist.all_reduce(loss_1)
+            loss_1 = loss_1 / cfg.TRAIN.BATCH_SIZE
+
+            loss_2 = loss_2 * n
+            dist.all_reduce(loss_2)
+            loss_2 = loss_2 / cfg.TRAIN.BATCH_SIZE
+
         loss_meter_1.update(loss_1.item(), cfg.TRAIN.BATCH_SIZE)
         loss_meter_2.update(loss_2.item(), cfg.TRAIN.BATCH_SIZE)
         
@@ -283,11 +268,6 @@ def train(model, train_loader, optimizer, epoch, cfg):
 
         current_iter = (epoch-1)*len(train_loader) + i_iter+1
 
-        # lr = adjust_learning_rate(optimizer,
-        #                           cfg.TRAIN.OPT.LR,
-        #                           max_iter,
-        #                           current_iter)
-
         # * compute remain time
         remain_iter = max_iter - current_iter
         remain_time = remain_iter * batch_time.avg
@@ -295,7 +275,7 @@ def train(model, train_loader, optimizer, epoch, cfg):
         t_h, t_m = divmod(t_m, 60)
         remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
         
-        if (i_iter+1) % cfg.TRAIN.PRINT_FREQ == 0 :#and dist.get_rank() == 0:
+        if (i_iter+1) % cfg.TRAIN.PRINT_FREQ == 0 and dist.get_rank() == 0:
             msg ='Epoch: [{}/{}]({:.2f}%) [{}/{}] '\
                     'Data {data_time.val:.3f} ({data_time.avg:.3f}) '\
                     'Batch {batch_time.val:.3f} ({batch_time.avg:.3f}) '\
@@ -311,11 +291,9 @@ def train(model, train_loader, optimizer, epoch, cfg):
                                     remain_time=remain_time,
                                     loss_meter_1=loss_meter_1,
                                     loss_meter_2=loss_meter_2,
-                                    
                                     lr = [x['lr'] for x in optimizer.param_groups])
             logger.info(msg)
         end = time.time()
-        # exit()
 
 
     return loss_meter_1.avg,loss_meter_2.avg

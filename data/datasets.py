@@ -32,7 +32,6 @@ class WineDataSet(data.Dataset):
         wine_same_class = []
         wine_other_class = []
         for wine in np_frame:
-            # print(wine)
             same_class = []
             other_class = []
             for wine_other in np_frame:
@@ -58,8 +57,6 @@ class WineDataSet(data.Dataset):
             
         self.datasets = []
         for i in range(len(np_frame)):
-            if i >20:
-                break
             main_wine = np_frame[i]
             same_class = wine_same_class[i]
             other_class = wine_other_class[i]
@@ -70,66 +67,6 @@ class WineDataSet(data.Dataset):
                     data.append(same)
                     data.append(other)
                     self.datasets.append(data)
-        
-        # cache_name = 'wine_dataset'
-                    
-        # cache_file = "{}.pickle".format(cache_name)
-        # if os.path.isfile(cache_file):
-        #     with open(cache_file, "rb") as f_in:
-        #         self.datasets = pickle.load(f_in)
-        #     print('load')
-        # else:
-            
-        #     frame = pd.read_csv('data/sample_cleansingWine.csv')
-        #     np_frame = frame.to_numpy()
-        #     wine_same_class = []
-        #     wine_other_class = []
-        #     for wine in np_frame:
-        #         same_class = []
-        #         other_class = []
-        #         for wine_other in np_frame:
-        #             same_point = 0
-        #             if wine[1] == wine_other[1]:
-        #                 same_point+=1
-        #             if wine[2] == wine_other[2]:
-        #                 same_point+=1
-        #             if wine[3] == wine_other[3]:
-        #                 same_point+=1
-        #             if wine[4] == wine_other[4]:
-        #                 same_point+=1
-        #             if wine[5] == wine_other[5]:
-        #                 same_point+=1
-                    
-        #             if same_point > 2:
-        #                 same_class.append(wine)
-        #             else:
-        #                 other_class.append(wine)
-                
-        #         wine_same_class.append(same_class)
-        #         wine_other_class.append(other_class)
-                
-        #     self.datasets = []
-        #     for i in range(len(np_frame)):
-        #         if i >20:
-        #             break
-        #         main_wine = np_frame[i]
-        #         same_class = wine_same_class[i]
-        #         other_class = wine_other_class[i]
-        #         for same in same_class:
-        #             for other in other_class:
-        #                 data = []
-        #                 data.append(main_wine)
-        #                 data.append(same)
-        #                 data.append(other)
-        #                 self.datasets.append(data)
-                        
-        #     cache_obj = self.datasets
-        #     if not os.path.exists(cache_file):
-        #         with open(cache_file, "wb") as f_out:
-        #             pickle.dump(cache_obj, f_out)
-        #     print('dump')
-        #     # self.get_cached_result(cache_file, self.datasets)
-        
 
     def __len__(self):  #
         return len(self.datasets)
@@ -159,20 +96,6 @@ class WineDataSet(data.Dataset):
             wine_vector[i*5 + (int(value)-1)] = 1
             
         return wine_vector
-    
-    # def get_cached_result(cache_name, obj):
-    #     cache_file = "{}.pickle".format(cache_name)
-    #     cache_obj = None
-    #     if os.path.isfile(cache_file):
-    #         with open(cache_file, "rb") as f_in:
-    #             cache_obj = pickle.load(f_in)
-    #     else:
-    #         cache_obj = obj
-    #         if not os.path.exists(cache_file):
-    #             with open(cache_file, "wb") as f_out:
-    #                 pickle.dump(cache_obj, f_out)
-    #     return cache_obj
-
 
 # ---------------------------------------------------------------init-------------------------
 
@@ -189,8 +112,8 @@ def build_train_loader(cfg):
 
     data_loader = torch.utils.data.DataLoader(train_data,
                                               num_workers=4,
-                                              batch_size=64 // 4,
-                                              shuffle=True,
+                                              batch_size=cfg.TRAIN.BATCH_SIZE // len(cfg.SYS.GPUS),
+                                              shuffle=False,
                                               pin_memory=True,
                                               drop_last=True,
                                               sampler=sampler)

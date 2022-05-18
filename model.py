@@ -24,15 +24,15 @@ class SiameseNetwork(nn.Module):
         self.fc1 = nn.Sequential(
             nn.Linear(25, 64),
             nn.BatchNorm1d(64),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
 
             nn.Linear(64, 256),
             nn.BatchNorm1d(256),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             
             nn.Linear(256, 64),
             nn.BatchNorm1d(64),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
 
             nn.Linear(64, 64),
             # nn.Sigmoid(),
