@@ -27,7 +27,7 @@ class WineDataSet(data.Dataset):
             root: 
         '''
         
-        frame = pd.read_csv('data/sample_cleansingWine.csv')
+        frame = pd.read_csv('data/sample_cleansingWine100.csv')
         np_frame = frame.to_numpy()
         wine_same_class = []
         wine_other_class = []
@@ -77,11 +77,10 @@ class WineDataSet(data.Dataset):
         same_wine = data[1]
         other_wine = data[2]
         
-        main_wine_vector = self.one_hot_encoding(main_wine)
-        same_wine_vector = self.one_hot_encoding(same_wine)
-        other_wine_vector = self.one_hot_encoding(other_wine)
+        main_wine_vector = self.normalize_encoding(main_wine)
+        same_wine_vector = self.normalize_encoding(same_wine)
+        other_wine_vector = self.normalize_encoding(other_wine)
         
-    
         return main_wine_vector, same_wine_vector, other_wine_vector
 
     def one_hot_encoding(self, wine):
@@ -96,6 +95,13 @@ class WineDataSet(data.Dataset):
             wine_vector[i*5 + (int(value)-1)] = 1
             
         return wine_vector
+
+    def normalize_encoding(self, wine):
+        '''
+        '''
+        wine_vector = torch.tensor(wine[1:])
+        wine_vector = wine_vector / 5
+        return wine_vector.float()
 
 # ---------------------------------------------------------------init-------------------------
 

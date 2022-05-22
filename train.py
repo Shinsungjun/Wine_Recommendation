@@ -121,7 +121,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.OPT.LR)
     # print(cfg.TRAIN.OPT.LR)
     # * define LR Scheduler * #
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.8)    
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)    
 
     # * build DATALODER * #
     train_loader = build_train_loader(cfg)
@@ -239,15 +239,16 @@ def train(model, train_loader, optimizer, epoch, cfg):
         outputs_1 = model(inputs[0].to('cuda'),inputs[1].to('cuda')) #same # returns loss and predictions at each GPU
         loss_1 = loss_fn_1(outputs_1, torch.ones(outputs_1.shape).to('cuda'))
         
-        loss_1.backward() # distributed.datapaprallel automatically gather and syncronize losses.
-        optimizer.step()
+        #loss_1.backward() # distributed.datapaprallel automatically gather and syncronize losses.
+        #optimizer.step()
         
         # loss_2
         outputs_2 = model(inputs[0].to('cuda'),inputs[2].to('cuda')) #diff # returns loss and predictions at each GPU
         loss_2 = loss_fn_2(outputs_2, torch.zeros(outputs_2.shape).to('cuda'))
-        optimizer.zero_grad()
         
-        loss_2.backward()
+        loss = loss_1 * 2 + loss_2
+        optimizer.zero_grad()
+        loss.backward()
         optimizer.step()
 
         # *  this tis for recordings.
