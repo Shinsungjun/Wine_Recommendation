@@ -119,7 +119,7 @@ def main():
     # params = [{'params': list(params_dict.values()), 'lr': cfg.TRAIN.OPT.LR}]
 
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.OPT.LR)
-    print(cfg.TRAIN.OPT.LR)
+    # print(cfg.TRAIN.OPT.LR)
     # * define LR Scheduler * #
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.8)    
 
@@ -163,11 +163,12 @@ def main():
             # optimizer control
             optimizer.load_state_dict(checkpoint['optimizer'])
 
-            if dist.get_rank()==0:
-                logger.info("=> loaded checkpoint '{}' (epoch {})".format(cfg.TRAIN.RESUME, checkpoint['epoch']))
+            #if dist.get_rank()==0:
+            logger.info("=> loaded checkpoint '{}' (epoch {})".format(cfg.TRAIN.RESUME, checkpoint['epoch']))
+            logger.info("load success")
         else:
-            if dist.get_rank()==0:
-                logger.info("=> no checkpoint found at '{}'".format(cfg.TRAIN.RESUME))
+            #if dist.get_rank()==0:
+            logger.info("=> no checkpoint found at '{}'".format(cfg.TRAIN.RESUME))
 
     if args.local_rank <= 0:
         logger.info(config.summary(cfg))
@@ -184,7 +185,7 @@ def main():
             if best_loss > train_loss_total:
                 torch.save({
                     'epoch': epoch,
-                    'state_dict': model.module.state_dict(),
+                    'state_dict': model.state_dict(),
                     'optimizer': optimizer.state_dict(),
                 }, os.path.join(cfg.SYS.OUTPUT_DIR,'best.pth.tar'))
                 best_loss = train_loss_total
@@ -192,7 +193,7 @@ def main():
 
             torch.save({
                 'epoch': epoch,
-                'state_dict': model.module.state_dict(),
+                'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
                 'best_loss': best_loss,
                 'bset_epoch': best_epoch,
@@ -207,7 +208,7 @@ def main():
         scheduler.step()
 
     if args.local_rank <= 0:
-        torch.save(model.module.state_dict(),
+        torch.save(model.state_dict(),
             os.path.join(cfg.SYS.OUTPUT_DIR, 'final_state.pth'))
 
     
@@ -228,6 +229,7 @@ def train(model, train_loader, optimizer, epoch, cfg):
     loss_fn_2 = torch.nn.BCEWithLogitsLoss()
     
     for i_iter, (inputs) in enumerate(train_loader):
+        
         optimizer.zero_grad()
         
         data_time.update(time.time() - end)

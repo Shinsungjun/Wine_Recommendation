@@ -1,12 +1,12 @@
 SYS:
-  EXP_NAME: 'base_single'
+  EXP_NAME: 'base_single_resume'
   GPUS: (0)
   WORKERS: 8
   PIN_MEMORY: True
   LOCAL_RANK: ''
 
 TRAIN:
-  RESUME: ''
+  RESUME: 'results/base_single/checkpoint.pth.tar'
   START_EPOCH: 1
   END_EPOCH: 30
   PRINT_FREQ: 50
