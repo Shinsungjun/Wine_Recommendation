@@ -58,10 +58,10 @@ def main():
     
     model.eval()
     loss_fn_1 = torch.nn.BCEWithLogitsLoss()
-    user_taste = torch.tensor([000, 1.0,4.0,4.0,1.0,2.0])
-    user_taste = normalize_encoding(user_taste)
-    user_taste = user_taste.view(1, -1).to('cuda')
-    user_taste = user_taste.expand(100, 5).to('cuda')
+    user_taste = [000, 1.0,4.0,4.0,1.0,2.0]
+    user_taste_tensor = normalize_encoding(user_taste)
+    user_taste_tensor = user_taste_tensor.view(1, -1).to('cuda')
+    user_taste_tensor = user_taste_tensor.expand(100, 5).to('cuda')
     #print(user_taste == wines)
     # for i in range(len(wines)):
     #     output = model(user_taste, wines[i].view(1,-1))
@@ -74,16 +74,34 @@ def main():
     # print("wines shape : ", wines.shape) #100 x 25
     # print("user taste shape : ", user_taste.shape) #100 x 25
 
-    output = model(user_taste, wines)
+    output = model(user_taste_tensor, wines)
     topidx = sorted(range(len(output)),key= lambda i: output[i])[:5]
-    print(topidx)
-    print(np_frame[topidx])
+    #print(topidx)
     
-    top_5_wine = np_frame[topidx]
-    top_5_wine_id = top_5_wine[:, 0]
-    print(top_5_wine_id)
-
-
-
+    full_wine_info = pd.read_csv('data/wine_100name.csv')
+    full_wine_info = full_wine_info.to_numpy()
+    '''
+    columns
+        [0] = id
+        [1] = name
+        [2] = producer
+        [3] = nation
+        [4] = abv
+        [5] = degree
+        [6] = sweet
+        [7] = acidity
+        [8] = body
+        [9] = tannin
+        [10] = price
+        [11] = year
+        [12] = ml
+    '''    
+    top_5_wine = full_wine_info[topidx]
+    msg = "SWEET : {}\nACIDITY : {}\nBODY : {}\nTANNIN : {}"
+    print("User Taste :\n" + msg.format(user_taste[1], user_taste[2], user_taste[3] ,user_taste[4]))
+    print("\n\n")
+    for i, top_wine in enumerate(top_5_wine):
+        print(f"TOP : {i+1}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[6], top_wine[7], top_wine[8] ,top_wine[9]))
+        print("\n\n")
 if __name__ == '__main__':
     main()
