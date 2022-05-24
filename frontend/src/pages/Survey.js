@@ -22,9 +22,15 @@ function Survey() {
 
     return (
       <div id="form-wrapper">
-          <Title/>
-          <form action="http://127.0.0.1:8000/api/get-recommend"  method="POST">
+          <form action="http://127.0.0.1:8000/api/get-recommend" method="POST">
+		<h1 id="form-title">Dobby Eating Grapes</h1>
+		<hr class='hr-solid'/>
+		<h1 id="letter1">당신의 취향에 맞는 와인!</h1>
+		<h1 id="question1">1. 와인이 어떤 타입이었으면 좋겠나요?</h1>
+
+
 		<div id="debt-amount-slider">
+			
             <div>
 			<input type="radio" name="type-debt-amount" id="type-1" value="1" onChange={checkedItemHandler} required/>
 			<label htmlFor="type-1" data-debt-amount="Red"></label>
@@ -38,6 +44,8 @@ function Survey() {
 			<label htmlFor="type-5" data-debt-amount="ETC"></label>
 			<div id="debt-amount-pos"></div>
             </div>
+			<h1 id="question2">2. 와인이 어떤 타입이었으면 좋겠나요?</h1>
+
             <div>
 			<input type="radio" name="sweet-debt-amount" id="sweet-1" value="1" onChange={checkedItemHandler} required/>
 			<label for="sweet-1" data-debt-amount="None"></label>
@@ -51,6 +59,8 @@ function Survey() {
 			<label for="sweet-5" data-debt-amount="Much"></label>
 			<div id="debt-amount-pos"></div>
             </div>
+		<h1 id="question3">3. 신맛이 얼마나 있으면 좋겠나요?</h1>
+
             <div>
 			<input type="radio" name="acid-debt-amount" id="acid-1" value="1" onChange={checkedItemHandler} required/>
 			<label for="acid-1" data-debt-amount="None"></label>
@@ -64,6 +74,8 @@ function Survey() {
 			<label for="acid-5" data-debt-amount="Much"></label>
 			<div id="debt-amount-pos"></div>
             </div>
+		<h1 id="question4">4. 와인이 입안에 들어왔을때, 얼마나 무게감있게 느껴졌으면 좋겠나요?</h1>
+
             <div>
 			<input type="radio" name="body-debt-amount" id="body-1" value="1" onChange={checkedItemHandler} required/>
 			<label for="body-1" data-debt-amount="None"></label>
@@ -77,6 +89,8 @@ function Survey() {
 			<label for="body-5" data-debt-amount="Much"></label>
 			<div id="debt-amount-pos"></div>
             </div>
+		<h1 id="question5">5. 와인이 어느 정도의 떫음을 가졌으면 좋겠나요?</h1>
+
             <div>
 			<input type="radio" name="tannin-debt-amount" id="tannin-1" value="1" onChange={checkedItemHandler} required/>
 			<label for="tannin-1" data-debt-amount="None"></label>
