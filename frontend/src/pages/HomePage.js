@@ -1,13 +1,19 @@
+import Title from "../components/Title";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link
+} from "react-router-dom";
+
 function HomePage() {
   return (
     <div className="home-page">
-      <div className="title">
-        <h1>Dobby Eating Grapes</h1>
-      </div>
+      <Title/>
       <div className="start-survey">
-      <a>
+      <Link to="survey">
           icon
-        </a>
+        </Link>
       </div>
       <div className="help-text">
         <span>간단한 5가지 질문에 답해주세요!</span><br/>

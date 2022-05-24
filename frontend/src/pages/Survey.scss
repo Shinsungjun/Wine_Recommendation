@@ -18,6 +18,7 @@ $number-of-options: 5;
 }
 
 
+
 form {
 	width: 90%;
 	max-width: 500px;
@@ -142,55 +143,27 @@ form {
 			}
 		}
 	}
-	& + button {
-		display: block;
-		position: relative;
-		margin: 56px auto 0;
-		padding: 10px 20px;
-		appearance: none;
-		transition: all 0.15s ease-in-out;
-		font-family: inherit;
-		font-size: 24px;
-		font-weight: 600;
-		background: #fff;
-		border: 2px solid #000;
-		border-radius: 8px;
-		outline: 0;
-		user-select: none;
-		cursor: pointer;
-		&:hover {
-			// transform: scale(1.1);
-			background: #000;
-			color: #fff;
-			&:active {
-				transform: scale(0.9);
-			}
-		}
-		&:focus {
-			background: #4caf50;
-			border-color: #4caf50;
-			color: #fff;
-			pointer-events: none;
-			&::before {
-				animation: spin 1s linear infinite;
-			}
-		}
-		&::before {
-			display: inline-block;
-			width: 0;
-			opacity: 0;
-			content: "\f3f4";
-			font-family: "Font Awesome 5 Pro";
-			font-weight: 900;
-			margin-right: 0;
-			transform: rotate(0deg);
-		}
-	}
-	&:invalid + button {
-		pointer-events: none;
-		opacity: 0.25;
-	}
+
 }
+.submit-info {
+	display: block;
+	position: relative;
+	margin: 56px auto 0;
+	padding: 10px 20px;
+	appearance: none;
+	transition: all 0.15s ease-in-out;
+	font-family: inherit;
+	font-size: 24px;
+	font-weight: 600;
+	background: #fff;
+	border: 2px solid #000;
+	border-radius: 8px;
+	outline: 0;
+	user-select: none;
+	cursor: pointer;
+	
+}
+
 @keyframes spin {
 	from {
 		transform: rotate(0deg);
