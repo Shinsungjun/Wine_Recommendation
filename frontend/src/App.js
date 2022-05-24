@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import HomePage from './pages/HomePage';
 import Survey from './pages/Survey';
+import WineInfo from './pages/WineInfo';
 import './App.css';
 import {
   BrowserRouter,
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/survey" element={<Survey />} />
+        <Route path="/info" element={<WineInfo />} />
       </Routes>
     </BrowserRouter>
     </div>

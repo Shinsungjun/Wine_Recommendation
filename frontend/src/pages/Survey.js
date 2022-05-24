@@ -6,12 +6,12 @@ import Progress from "../components/Progress";
 import "./Survey.scss"
 
 function Survey() {
-    const [loading, setLoading] = useState(false)
+    const [data, setLoading] = useState(null)
 
 
     return (
       <div id="form-wrapper">
-          <Title/> { loading ?  <Progress /> :<Questions callLoading={setLoading}/> }
+          <Title/> { data ?  <Progress data={data}/> :<Questions callLoading={setLoading} updateData={setLoading}/> }
 
     {/* <ProgressBar/> */}
       </div>

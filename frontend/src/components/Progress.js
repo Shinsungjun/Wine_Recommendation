@@ -1,18 +1,19 @@
 import ProgressBar from "progressbar.js"
 import {useEffect} from "react"
+import {useNavigate} from "react-router-dom"
 import "./Progress.css"
 
-function Progress() {
-
+function Progress({data}) {
+    const navigate = useNavigate()
     useEffect(()=>{
-
         var circle = new ProgressBar.Line('#progress-bar', {
             color: '#ffffff',
             duration: 5000,
             easing: 'easeInOut'
         });
-    
-        circle.animate(1);
+        circle.animate(1,()=>{
+            navigate("/info",{state:data})
+        });
     })
     return (
     <div className="progress">

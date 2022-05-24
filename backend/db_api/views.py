@@ -39,7 +39,7 @@ def recommend(request):
         returnData = inference(data)
         print(returnData)
         # print(json.loads(request.body.decode('utf-8')))
-        return JsonResponse(json.dumps(returnData.tolist()),safe=False)
+        return JsonResponse(json.dumps(returnData),safe=False)
     else:
         return HttpResponse("Wrong Method!")
 # Create your views here.

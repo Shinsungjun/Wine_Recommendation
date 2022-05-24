@@ -27,7 +27,6 @@ def normalize_encoding(wine):
         return wine_vector.float()
 
 def inference(user_taste):
-    print("start")
     frame = pd.read_csv('ml/data/sample_cleansingWine100.csv')
     np_frame = frame.to_numpy()
     wines = None
@@ -41,7 +40,6 @@ def inference(user_taste):
     model = SiameseNetwork()
 
     checkpoint_path = 'ml/results/base_single_100_L2/best.pth.tar'
-    print("loaded")
     if os.path.isfile(checkpoint_path):
         checkpoint = torch.load(checkpoint_path, map_location=lambda storage, loc: storage)
         
@@ -75,7 +73,7 @@ def inference(user_taste):
     # print("user taste shape : ", user_taste.shape) #100 x 25
 
     output = model(user_taste_tensor, wines)
-    print("predicted")
+    # print("output shape : ", output.shape)
     output = output.sigmoid()
     # print(output)
     output = output.view(100).cpu().detach().numpy()
@@ -86,7 +84,53 @@ def inference(user_taste):
 
     # difftopidx = difftopidx[np.argsort(output[difftopidx])]
     
-    return topidx
+    # return topidx
+    # print(topidx)
+    # print(output[topidx])
+    # print(output[difftopidx])
+    # topidx = sorted(range(len(output)),key= lambda i: output[i])[:5]
+    # difftopidx = sorted(range(len(output)),key= lambda i: output[i])[-5:]
+    #print(topidx)
+    
+
+    full_wine_info = pd.read_csv('ml/data/wine_100name.csv')
+    full_wine_info = full_wine_info.to_numpy()
+    '''
+    columns
+        [0] = id
+        [1] = name
+        [2] = producer
+        [3] = nation
+        [4] = abv
+        [5] = degree
+        [6] = sweet
+        [7] = acidity
+        [8] = body
+        [9] = tannin
+        [10] = Type
+        [11] = price
+        [12] = year
+        [13] = ml
+    '''    
+    # diff_top_5_wine = full_wine_info[difftopidx]
+    # diff_distances = output[difftopidx]
+    top_wine = full_wine_info[topidx][0]
+    distances = output[topidx]
+    types = {'1' : 'RED', '2' :'WHITE', '3':'SPARKING', '4' : 'ROSE', '5':'ETC' }
+    return_data = {'name' : top_wine[1],
+                    'producer' : top_wine[2],
+                    'nation' : top_wine[3],
+                    'abv' : top_wine[4],
+                    'degree' : top_wine[5],
+                    'sweet' : int(top_wine[6][-1]),
+                    'acidity' : int(top_wine[7][-1]),
+                    'body' : int(top_wine[8][-1]),
+                    'tannin' : int(top_wine[9][-1]),
+                    'type' : types[str(int(top_wine[10]))],
+                    'price' : top_wine[11],
+                    'year' : top_wine[12],
+                    'ml' : top_wine[13]}
+    return return_data
     # print(topidx)
     # print(output[topidx])
     # print(output[difftopidx])
