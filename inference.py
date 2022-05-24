@@ -89,29 +89,31 @@ def main():
         [1] = name
         [2] = producer
         [3] = nation
-        [4] = abv
-        [5] = degree
-        [6] = sweet
-        [7] = acidity
-        [8] = body
-        [9] = tannin
-        [10] = price
-        [11] = year
-        [12] = ml
+        [4] = type
+        [5] = use
+        [6] = abv
+        [7] = degree
+        [8] = sweet
+        [9] = acidity
+        [10] = body
+        [11] = tannin
+        [12] = price
+        [13] = year
+        [14] = ml
     '''    
     diff_top_5_wine = full_wine_info[difftopidx]
     top_5_wine = full_wine_info[topidx]
     diff_distances = output[difftopidx]
     distances = output[topidx]
-    msg = "SWEET : {}\nACIDITY : {}\nBODY : {}\nTANNIN : {}"
-    print("User Taste :\n" + msg.format(user_taste[1], user_taste[2], user_taste[3] ,user_taste[4]))
+    msg = "SWEET : {}\nACIDITY : {}\nBODY : {}\nTANNIN : {}\nTYPE : {}"
+    print("User Taste :\n" + msg.format(user_taste[1], user_taste[2], user_taste[3] ,user_taste[4], user_taste[5]))
     print("\n\n")
     for i, top_wine in enumerate(top_5_wine):
-        print(f"TOP : {i+1}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[6], top_wine[7], top_wine[8] ,top_wine[9]))
+        print(f"TOP : {i+1}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[8], top_wine[9], top_wine[10] ,top_wine[11], top_wine[4]))
         print(f"Similarity : {distances[i].item()}")
         print("\n\n")
     for i, top_wine in enumerate(diff_top_5_wine):
-        print(f"DIFFTOP : {5-i}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[6], top_wine[7], top_wine[8] ,top_wine[9]))
+        print(f"DIFFTOP : {5-i}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[8], top_wine[9], top_wine[10] ,top_wine[11], top_wine[4]))
         print(f"Similarity : {diff_distances[i].item()}")
         print("\n\n")
     
