@@ -2,10 +2,23 @@
 
 }
 
-.wine-info h3 {
-    border-bottom: 3px solid #420065;
-    padding-bottom: 2rem;
+.wine-info .header-container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    border-bottom : 3px solid #420065
 }
+
+.wine-info .header{
+    display: flex;
+    flex-direction: row;
+}
+
+.wine-info .header img{
+    height: 3rem;
+}
+
 
 .wine-info .meta{
     border-left: 2px solid #420065;
@@ -24,11 +37,17 @@
     border : 3px solid #420065;
     margin :10px;
     display: flex;
+    font-size: 2rem;
+}
+
+.wine-info h6 {
+    margin: 1rem;
 }
 
 .wine-info img{
-    border-radius: 50%;
-    border: 15px solid #420065;
+    height: 30rem;
+    /* border-radius: 50%; */
+    /* border: 15px solid #420065; */
 }
 
 .wine-info .info-container .column {

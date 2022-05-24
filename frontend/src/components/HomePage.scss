@@ -9,22 +9,39 @@
 
   border: 0;
   /* text-indent:-9999px;  */
-  background-image: url("../pages/img/web1_img1.jpg");
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: center;
+  // background-image: 
   
 }
-.wine_icon{
-  display: inline-block;
-  position: absolute;
-  top: 160px;
-  right: 240px;
-	align-items: center;
-	justify-content: center;
 
-  width:300px;
-  height:300px;
+.home-page .start-survey {
+  height: 400px;
+  background-image: url("../pages/img/web1_img1.jpg");
+  background-repeat: no-repeat;
+  background-size: 80%;
+  background-position: center;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.home-page .start-link{
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.wine_icon{
+  // display: inline-block;
+  // position: absolute;
+  // top: 160px;
+  // right: 240px;
+	// align-items: center;
+	// justify-content: center;
+  margin : auto 0px;
+  width:10rem;
+  height:10rem;
 
   border: 0;
   /* text-indent:-9999px;  */

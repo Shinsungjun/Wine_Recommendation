@@ -15,10 +15,10 @@ function HomePage() {
       <Title/>
       {/* <div className="start-survey" style="position: relative;"> */}
       <div className="start-survey" >
-      <svg src="./img/web1_img1.jpg" class="circle" width="100px" height="100px" border="" ></svg>
+      {/* <svg src="./img/web1_img1.jpg" class="circle" width="100px" height="100px" border="" ></svg> */}
         
         {/* <div style="position: absolute; top: 50px; left: 50px;"> */}
-      <Link to="survey">
+      <Link to="survey" className="start-link">
         <svg src="./img/web1_1.svg" class="wine_icon" width="100px" height="100px" border=""></svg>
         </Link>
         {/* </div> */}
