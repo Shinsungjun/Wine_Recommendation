@@ -116,20 +116,23 @@ def inference(user_taste):
     # diff_distances = output[difftopidx]
     top_wine = full_wine_info[topidx][0]
     distances = output[topidx]
+    img_path = "/wine/" + str(topidx[0]+1) + ".png"
     types = {'1' : 'RED', '2' :'WHITE', '3':'SPARKING', '4' : 'ROSE', '5':'ETC' }
     return_data = {'name' : top_wine[1],
                     'producer' : top_wine[2],
                     'nation' : top_wine[3],
-                    'abv' : top_wine[4],
-                    'degree' : top_wine[5],
+                    # 'abv' : top_wine[4],
+                    # 'degree' : top_wine[5],
                     'sweet' : int(top_wine[6][-1]),
                     'acidity' : int(top_wine[7][-1]),
                     'body' : int(top_wine[8][-1]),
                     'tannin' : int(top_wine[9][-1]),
                     'type' : types[str(int(top_wine[10]))],
                     'price' : top_wine[11],
-                    'year' : top_wine[12],
-                    'ml' : top_wine[13]}
+                    # 'year' : top_wine[12],
+                    'ml' : top_wine[13],
+                    'path':img_path
+                    }
     return return_data
     # print(topidx)
     # print(output[topidx])

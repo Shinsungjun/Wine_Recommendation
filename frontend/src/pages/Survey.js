@@ -11,7 +11,7 @@ function Survey() {
 
     return (
       <div id="form-wrapper">
-          <Title/> { data ?  <Progress data={data}/> :<Questions callLoading={setLoading} updateData={setLoading}/> }
+          <Title/> { data ?  <Progress data={data}/> :<Questions  updateData={setLoading}/> }
 
     {/* <ProgressBar/> */}
       </div>

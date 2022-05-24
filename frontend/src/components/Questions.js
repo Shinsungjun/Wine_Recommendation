@@ -7,7 +7,7 @@ import {
   Link
 } from "react-router-dom";
 
-function Questions({callLoading, updateData}) {
+function Questions({updateData}) {
     const [checked, setChecked] = useState({})
     const checkedItemHandler = ({target})=>{
             checked[target.name] = target.value
@@ -16,11 +16,11 @@ function Questions({callLoading, updateData}) {
     }
     const onSubmit = async (e)=>{
         e.preventDefault()
-        callLoading(true)
         // console.log(123)
         // let bar = new ProgressBar.Line('#progress-bar', {easing: 'easeInOut'});
         // bar.animate(1);
         let data = await axios.post("http://127.0.0.1:8000/api/get-recommend",{checked})
+		console.log(JSON.parse(data["data"]))
 		updateData(JSON.parse(data["data"]))
     }
   return (

@@ -26,6 +26,11 @@
     display: flex;
 }
 
+.wine-info img{
+    border-radius: 50%;
+    border: 15px solid #420065;
+}
+
 .wine-info .info-container .column {
     border-right: 1px solid #420065;
     padding: 0 1rem;

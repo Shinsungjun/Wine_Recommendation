@@ -6,13 +6,13 @@ import "./WineInfo.css"
 function WineInfo() {
     const location = useLocation()
     const data = location.state
-
+    console.log(2)
     return (
       <div className="wine-info">
           <Title/>
           <h3>당신에게 딱 맞는 와인</h3>
           <h1>{data.name}</h1>
-          <img src={data.path}></img>
+          <img src={data.path}/>
           <div>
               <span >{data.ml}</span>
               <span className="meta">{data.abv}</span>
