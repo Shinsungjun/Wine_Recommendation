@@ -58,11 +58,8 @@ class SiameseNetwork(nn.Module):
         # output = self.fc2(feats)
         res = self.L2(output1, output2)
         res = 1/res
-        print("res: ", res)
         output = torch.log(res)
         # output = 
-        
-        
         return output
 
     def L2(self, output1, output2):
