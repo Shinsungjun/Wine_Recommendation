@@ -24,7 +24,7 @@ form {
 	max-width: 500px;
 	#form-title {
 		margin-top: 20;
-		font-weight: 400;
+		font-weight: bold;
 		text-align: center;
 	}
 	hr {
@@ -198,6 +198,7 @@ form {
 }
 .submit-info {
 	display: block;
+	color: #420065;
 	position: relative;
 	margin: 56px auto 0;
 	padding: 10px 20px;
@@ -207,7 +208,7 @@ form {
 	font-size: 24px;
 	font-weight: 600;
 	background: #fff;
-	border: 2px solid #000;
+	border: 2px solid #5C4766;
 	border-radius: 8px;
 	outline: 0;
 	user-select: none;
