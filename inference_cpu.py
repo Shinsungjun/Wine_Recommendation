@@ -33,16 +33,15 @@ def main():
     for wine in np_frame:
         if wines == None:
             wines = normalize_encoding(wine)
-            wines = wines.view(1, -1).to('cuda') #B x C
+            wines = wines.view(1, -1) #B x C
         else:
-            wines = torch.cat([wines, normalize_encoding(wine).view(1, -1).to('cuda')], dim=0)
+            wines = torch.cat([wines, normalize_encoding(wine).view(1, -1)], dim=0)
     
     model = SiameseNetwork()
-    model = model.to('cuda')
 
-    checkpoint_path = 'results/base_single_100_L2/best.pth.tar'
+    checkpoint_path = 'results/base_single_100_loss_same/best.pth.tar'
     if os.path.isfile(checkpoint_path):
-        checkpoint = torch.load(checkpoint_path, map_location=lambda storage, loc: storage.cuda())
+        checkpoint = torch.load(checkpoint_path, map_location=lambda storage, loc: storage)
         
         # state_dict control
         checkpoint_dict = checkpoint['state_dict']
@@ -58,26 +57,13 @@ def main():
     
     model.eval()
     loss_fn_1 = torch.nn.BCEWithLogitsLoss()
-    user_taste = [000, 4.0,1.0,3.0,1.0,2.0]
+    user_taste = [000, 3.0,3.0,3.0,3.0,3.0]
     user_taste_tensor = normalize_encoding(user_taste)
-    user_taste_tensor = user_taste_tensor.view(1, -1).to('cuda')
-    user_taste_tensor = user_taste_tensor.expand(100, 5).to('cuda')
-    #print(user_taste == wines)
-    # for i in range(len(wines)):
-    #     output = model(user_taste, wines[i].view(1,-1))
-    #     print(output)
-    #     loss_1 = loss_fn_1(output, torch.ones(output.shape).to('cuda'))
-    #     print("loss : ", loss_1)
-
-    #     loss_2 = loss_fn_1(output, torch.zeros(output.shape).to('cuda'))
-    #     print("loss : ", loss_2)
-    # print("wines shape : ", wines.shape) #100 x 25
-    # print("user taste shape : ", user_taste.shape) #100 x 25
+    user_taste_tensor = user_taste_tensor.view(1, -1)
+    user_taste_tensor = user_taste_tensor.expand(100, 5)
 
     output = model(user_taste_tensor, wines)
-    print("output shape : ", output.shape)
     output = output.sigmoid()
-    print(output)
     output = output.view(100).cpu().detach().numpy()
     topidx = np.argpartition(output, -5)[-5:]
     difftopidx = np.argpartition(output, 5)[:5]
@@ -86,9 +72,6 @@ def main():
 
     difftopidx = difftopidx[np.argsort(output[difftopidx])]
     
-    print(topidx)
-    print(output[topidx])
-    print(output[difftopidx])
     # topidx = sorted(range(len(output)),key= lambda i: output[i])[:5]
     # difftopidx = sorted(range(len(output)),key= lambda i: output[i])[-5:]
     #print(topidx)

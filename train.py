@@ -246,7 +246,7 @@ def train(model, train_loader, optimizer, epoch, cfg):
         outputs_2 = model(inputs[0].to('cuda'),inputs[2].to('cuda')) #diff # returns loss and predictions at each GPU
         loss_2 = loss_fn_2(outputs_2, torch.zeros(outputs_2.shape).to('cuda'))
         
-        loss = loss_1 * 2 + loss_2
+        loss = loss_1 + loss_2
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

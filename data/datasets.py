@@ -100,7 +100,7 @@ class WineDataSet(data.Dataset):
         '''
         '''
         wine_vector = torch.tensor(wine[1:])
-        wine_vector = wine_vector / 5
+        wine_vector = (wine_vector-3) / 2
         return wine_vector.float()
 
 # ---------------------------------------------------------------init-------------------------

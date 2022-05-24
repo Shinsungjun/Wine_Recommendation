@@ -1,5 +1,5 @@
 SYS:
-  EXP_NAME: 'base_single_100_loss'
+  EXP_NAME: 'base_single_100_L2'
   GPUS: (0)
   WORKERS: 8
   PIN_MEMORY: True
@@ -19,7 +19,7 @@ TRAIN:
     ENABLED: True
   OPT: 
     NAME: 'Adam'
-    LR: 0.01
+    LR: 0.001
     MOMENTUM: 0.9
 
 MODEL:
