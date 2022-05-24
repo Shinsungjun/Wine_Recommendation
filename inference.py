@@ -40,7 +40,7 @@ def main():
     model = SiameseNetwork()
     model = model.to('cuda')
 
-    checkpoint_path = 'results/base_single_100_normalize/best.pth.tar'
+    checkpoint_path = 'results/base_single_100_loss/best.pth.tar'
     if os.path.isfile(checkpoint_path):
         checkpoint = torch.load(checkpoint_path, map_location=lambda storage, loc: storage.cuda())
         
@@ -58,7 +58,7 @@ def main():
     
     model.eval()
     loss_fn_1 = torch.nn.BCEWithLogitsLoss()
-    user_taste = [000, 1.0,4.0,4.0,1.0,2.0]
+    user_taste = [000, 1.0,4.0,4.0,1.0,1.0]
     user_taste_tensor = normalize_encoding(user_taste)
     user_taste_tensor = user_taste_tensor.view(1, -1).to('cuda')
     user_taste_tensor = user_taste_tensor.expand(100, 5).to('cuda')
@@ -75,9 +75,12 @@ def main():
     # print("user taste shape : ", user_taste.shape) #100 x 25
 
     output = model(user_taste_tensor, wines)
-    topidx = sorted(range(len(output)),key= lambda i: output[i])[:5]
+    output = output.sigmoid()
+    difftopidx = sorted(range(len(output)),key= lambda i: output[i])[:5]
+    topidx = sorted(range(len(output)),key= lambda i: output[i])[-5:]
     #print(topidx)
     
+
     full_wine_info = pd.read_csv('data/wine_100name.csv')
     full_wine_info = full_wine_info.to_numpy()
     '''
@@ -96,12 +99,21 @@ def main():
         [11] = year
         [12] = ml
     '''    
+    diff_top_5_wine = full_wine_info[difftopidx]
     top_5_wine = full_wine_info[topidx]
+    diff_distances = output[difftopidx]
+    distances = output[topidx]
     msg = "SWEET : {}\nACIDITY : {}\nBODY : {}\nTANNIN : {}"
     print("User Taste :\n" + msg.format(user_taste[1], user_taste[2], user_taste[3] ,user_taste[4]))
     print("\n\n")
     for i, top_wine in enumerate(top_5_wine):
         print(f"TOP : {i+1}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[6], top_wine[7], top_wine[8] ,top_wine[9]))
+        print(f"Similarity : {distances[i].item()}")
         print("\n\n")
+    for i, top_wine in enumerate(diff_top_5_wine):
+        print(f"DIFFTOP : {5-i}\nNAME : {top_wine[1]}\n" + msg.format(top_wine[6], top_wine[7], top_wine[8] ,top_wine[9]))
+        print(f"Similarity : {diff_distances[i].item()}")
+        print("\n\n")
+    
 if __name__ == '__main__':
     main()

@@ -33,6 +33,13 @@ class SiameseNetwork(nn.Module):
             nn.Linear(32, 5)
             # nn.Sigmoid(),
         )
+        self.fc2 = nn.Sequential(
+            nn.Linear(10, 10),
+            nn.BatchNorm1d(10),
+            nn.ReLU(inplace=True),
+
+            nn.Linear(10, 1)
+        )
 
     def forward_once(self, x):
         # output = self.cnn1(x)
@@ -44,11 +51,13 @@ class SiameseNetwork(nn.Module):
         output1 = self.forward_once(input1)
         output2 = self.forward_once(input2)
         
-        res = self.L2(output1, output2)
+        cat_feat = torch.cat([output1, output2], dim=1)
+        output = self.fc2(cat_feat)
+        #res = self.L2(output1, output2)
         # output = 
         
         
-        return res
+        return output
 
     def L2(self, output1, output2):
         # print(output1 == output2)

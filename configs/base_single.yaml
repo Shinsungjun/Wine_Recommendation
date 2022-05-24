@@ -1,5 +1,5 @@
 SYS:
-  EXP_NAME: 'base_single_100_normalize'
+  EXP_NAME: 'base_single_100_loss'
   GPUS: (0)
   WORKERS: 8
   PIN_MEMORY: True
