@@ -1,0 +1,9 @@
+.progress h1 {
+  margin : 5rem 30px;
+}
+
+.progress .progress-container{
+  padding : 10px;
+  background-color: #420065;
+  border-radius: 5px;
+}
