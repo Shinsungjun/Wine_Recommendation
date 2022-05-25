@@ -84,7 +84,7 @@ def inference(user_taste):
 
     # difftopidx = difftopidx[np.argsort(output[difftopidx])]
     
-    return topidx
+    # return topidx
     # print(topidx)
     # print(output[topidx])
     # print(output[difftopidx])
@@ -93,8 +93,8 @@ def inference(user_taste):
     #print(topidx)
     
 
-    # full_wine_info = pd.read_csv('data/wine_100name.csv')
-    # full_wine_info = full_wine_info.to_numpy()
+    full_wine_info = pd.read_csv('data/wine_100name.csv')
+    full_wine_info = full_wine_info.to_numpy()
     '''
     columns
         [0] = id
@@ -114,8 +114,23 @@ def inference(user_taste):
     '''    
     # diff_top_5_wine = full_wine_info[difftopidx]
     # diff_distances = output[difftopidx]
-    # top_5_wine = full_wine_info[topidx]
-    # distances = output[topidx]
+    top_wine = full_wine_info[topidx][0]
+    distances = output[topidx]
+
+    return_data = {'name' : top_wine[1],
+                    'producer' : top_wine[2],
+                    'nation' : top_wine[3],
+                    'abv' : top_wine[4],
+                    'degree' : top_wine[5],
+                    'sweet' : top_wine[6],
+                    'acidity' : top_wine[7],
+                    'body' : top_wine[8],
+                    'tannin' : top_wine[9],
+                    'type' : top_wine[10],
+                    'price' : top_wine[11],
+                    'year' : top_wine[12],
+                    'ml' : top_wine[13]}
+    return return_data
     # msg = "SWEET : {}\nACIDITY : {}\nBODY : {}\nTANNIN : {}\nTYPE : {}"
     # print("User Taste :\n" + msg.format(user_taste[1], user_taste[2], user_taste[3] ,user_taste[4], user_taste[5]))
     # print("\n\n")
